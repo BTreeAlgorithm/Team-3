@@ -1,7 +1,7 @@
 #include "unistd.h"
 int main(int argc, char const *argv[])
 {
-    int value = atoi(&argv[2]);
+    int value = atoi(argv[2]);
     int ret   = TRUE;
     B_Ttree * p_Btree = NULL;
 
