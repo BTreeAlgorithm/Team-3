@@ -25,3 +25,4 @@ struct B_Tree
 
 int insert(B_Tree * p_tree, int value);
 int search(B_Tree * p_tree, int value);
+int delete(B_Tree * p_tree, int value);
