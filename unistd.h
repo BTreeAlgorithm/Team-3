@@ -7,8 +7,8 @@
 
 struct B_Tree
 {
-	// point to an array, whose length is depended on the order that
-	// is decided by input.
+    // point to an array, whose length is depended on the order that
+    // is decided by input.
     int * p_key;
 
     // point to a pointer array. there should be (key_counter + 1)
