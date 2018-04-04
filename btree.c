@@ -1,9 +1,8 @@
-/*From
-https://sites.google.com/site/itstudentjunction/lab-programming-solutions/data-structures-programs/trees--programs---data-structures/program-for-implementation-of-b-tree-insertion--deletion
-*/
+
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define M 3
 
 struct node {
@@ -31,10 +30,11 @@ void getMinMax(struct node *ptr);
 int max(int first, int second, int third);
 int maxLevel(struct node *ptr);
 void printMaxLevel(struct node *ptr);
-
+int readFile();
 
 int main()
 {
+  readFile();
     int key;
     int choice;
     printf("Creation of B tree for M=%d\n",M);
@@ -84,7 +84,7 @@ int main()
             printTotal(root);
             break;
         case 8:
-            getMinMax(root); 
+            getMinMax(root);
             break;
         case 9:
         	printf("The maximum level in this tree is:\n");
@@ -116,6 +116,48 @@ void insert(int key)
         root->p[1] = newnode;
     }/*End of if */
 }/*End of insert()*/
+int readFile() {
+  FILE *file;
+ file = fopen("/Users/mikasa/Documents/2-3Binary-Tree/btreeinput.txt","r");
+   char buf[100];
+   int elements[20];
+  if (file == NULL)
+    {
+        perror("fopen()");
+        return 1;
+    }
+    fscanf(file,"%s",buf);
+    //printf("%s",buf);
+    int i=0,j=0;
+    
+     while(buf[i] != '\0') { 
+         char temp[5] = "";
+         int count = 0;
+        while(buf[i] != ',' && isdigit(buf[i])) {
+            temp[count] = buf[i];
+            count++;
+          i++;
+        }
+        //printf("%s \n",temp);
+        
+        i++;
+      elements[j] = atoi(temp);
+        j++;
+    
+     }
+    printf("Input Elements");
+    for(i=0;i<j;i++)
+    {
+        printf("%d,",elements[i]);
+    }
+    printf("Constructing the Tree");
+     for(i=0;i<j;i++)
+    {
+        insert(elements[i]);
+    }
+    printf("Construction Finished");
+   return 1;
+}
 
 enum KeyStatus ins(struct node *ptr, int key, int *upKey,struct node **newnode)
 {
@@ -368,7 +410,7 @@ enum KeyStatus del(struct node *ptr, int key)
 
 void eatline(void) {
   char c;
-  printf(" ");
+  printf("");
   while (c=getchar()!='\n') ;
 }
 
@@ -470,7 +512,7 @@ int maxLevel(struct node *ptr) {
 	if (ptr) {
 		int l = 0, mr = 0, r = 0, max_depth;
 		if (ptr->p[0] != NULL) l = maxLevel(ptr->p[0]);
-		if (ptr->p[1] != NULL) mr = maxLevel(ptr->p[1]);	
+		if (ptr->p[1] != NULL) mr = maxLevel(ptr->p[1]);
 		if (ptr->n == 2) {
 			if (ptr->p[2] != NULL) r = maxLevel(ptr->p[2]);
 		}
