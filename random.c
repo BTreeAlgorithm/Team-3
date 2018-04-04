@@ -11,6 +11,7 @@ int main(int argc, char const *argv[])
     if (argc != 2)
     {
         printf("format error!\n");
+        return 1;
     }
     scale = atoi ( argv [1] );
 
@@ -27,4 +28,5 @@ int main(int argc, char const *argv[])
     fprintf(fp, "%d\n", rdm);
 
     fclose ( fp );
+    return 1;
 }
