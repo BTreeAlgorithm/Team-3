@@ -22,11 +22,11 @@ int main(int argc, char const *argv[])
     for (int i = scale; i >= 2; --i)
     {
         rdm = rand();
-        fprintf(fp, "%d, ", rdm);
+        fprintf(fp, "%i,", rdm);
     }
     rdm = rand();
-    fprintf(fp, "%d\n", rdm);
+    fprintf(fp, "%i\n", rdm);
 
     fclose ( fp );
-    return 1;
+    return 0;
 }
