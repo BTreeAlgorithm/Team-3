@@ -20,18 +20,12 @@ void search(int x);
 enum KeyStatus ins(struct node *r, int x, int* y, struct node** u);
 int searchPos(int x,int *key_arr, int n);
 enum KeyStatus del(struct node *r, int x);
-/*void eatline(void);
-void inorder(struct node *ptr);
-int totalKeys(struct node *ptr);
-void printTotal(struct node *ptr);
-int getMin(struct node *ptr);
-int getMax(struct node *ptr);
-void getMinMax(struct node *ptr);
-int max(int first, int second, int third);
-int maxLevel(struct node *ptr);
-void printMaxLevel(struct node *ptr);*/
 int readFile();
 
+void comm_insert(int key)
+{
+    insert ( key );
+}
 int main(int argc, char const *argv[])
 {
     int key;
@@ -43,7 +37,7 @@ int main(int argc, char const *argv[])
     switch(choice)
     {
     case 'i':
-        insert(key);
+        comm_insert(key);
         break;
     case 'd':
         DelNode(key);
@@ -55,64 +49,6 @@ int main(int argc, char const *argv[])
         printf("Wrong choice\n");
         break;
     }
-    display(root,0);
-/*    while(1)
-    {
-        printf("1.Insert\n");
-        printf("2.Delete\n");
-        printf("3.Search\n");
-        printf("4.Display\n");
-        printf("5.Quit\n");
-        printf("6.Enumerate\n");
-        printf("7.Total Keys\n");
-        printf("8.Min and Max Keys\n");
-        printf("9.Max Level\n");
-        printf("Enter your choice : ");
-        scanf("%d",&choice); eatline();
-
-        switch(choice)
-        {
-        case i:
-            printf("Enter the key : ");
-            scanf("%d",&key); eatline();
-            insert(key);
-            break;
-        case d:
-            printf("Enter the key : ");
-            scanf("%d",&key); eatline();
-            DelNode(key);
-            break;
-        case s:
-            printf("Enter the key : ");
-            scanf("%d",&key); eatline();
-            search(key);
-            break;
-        case 4:
-            printf("Btree is :\n");
-            display(root,0);
-            break;
-        case 5:
-            exit(1);
-        case 6:
-            printf("Btree in sorted order is:\n");
-            inorder(root); putchar('\n');
-            break;
-        case 7:
-            printf("The total number of keys in this tree is:\n");
-            printTotal(root);
-            break;
-        case 8:
-            getMinMax(root);
-            break;
-        case 9:
-            printf("The maximum level in this tree is:\n");
-            printMaxLevel(root);
-            break;
-        default:
-            printf("Wrong choice\n");
-            break;
-        }
-    }*/
     return 0;
 }/*End of main()*/
 
@@ -156,48 +92,7 @@ int readFile()
 
     return 0;
 }
-// int readFile() {
-//   FILE *file;
-//  file = fopen("./test.dat","r");
-//    char buf[100];
-//    int elements[20];
-//   if (file == NULL)
-//     {
-//         perror("fopen()");
-//         return 1;
-//     }
-//     fscanf(file,"%s",buf);
-//     //printf("%s",buf);
-//     int i=0,j=0;
-    
-//      while(buf[i] != '\0') { 
-//          char temp[5] = "";
-//          int count = 0;
-//         while(buf[i] != ',' && isdigit(buf[i])) {
-//             temp[count] = buf[i];
-//             count++;
-//           i++;
-//         }
-//         //printf("%s \n",temp);
-        
-//         i++;
-//       elements[j] = atoi(temp);
-//         j++;
-    
-//      }
-// /*    printf("Input Elements");
-//     for(i=0;i<j;i++)
-//     {
-//         printf("%d,",elements[i]);
-//     }
-//     printf("Constructing the Tree");*/
-//      for(i=0;i<j;i++)
-//     {
-//         insert(elements[i]);
-//     }
-// /*    printf("Construction Finished");
-// */   return 1;
-// }
+
 
 enum KeyStatus ins(struct node *ptr, int key, int *upKey,struct node **newnode)
 {
@@ -448,125 +343,3 @@ enum KeyStatus del(struct node *ptr, int key)
     return --ptr->n >= (ptr == root ? 1 : min) ? Success : LessKeys;
 }/*End of del()*/
 
-/*void eatline(void) {
-  char c;
-  printf("");
-  while (c=getchar()!='\n') ;
-}
-*/
-/* Function to display each key in the tree in sorted order (in-order traversal)
-    @param struct node *ptr, the pointer to the node you are currently working with
-    */
-/*void inorder(struct node *ptr) {
-    if (ptr) {
-        if (ptr->n >= 1) {
-            inorder(ptr->p[0]);
-            printf("%d ", ptr->keys[0]);
-            inorder(ptr->p[1]);
-            if (ptr->n == 2) {
-                printf("%d ", ptr->keys[1]);
-                inorder(ptr->p[2]);
-            }
-        }
-    }
-}*/
-
-/* Function that returns the total number of keys in the tree.
-    @param struct node *ptr, the pointer to the node you are currently working with
-    */
-/*int totalKeys(struct node *ptr) {
-    if (ptr) {
-        int count = 1;
-        if (ptr->n >= 1) {
-            count += totalKeys(ptr->p[0]);
-            count += totalKeys(ptr->p[1]);
-            if (ptr->n == 2) count += totalKeys(ptr->p[2]) + 1;
-        }
-        return count;
-    }
-    return 0;
-}*/
-
-/* Function that prints the total number of keys in the tree.
-    @param struct node *ptr, the pointer to the node you are currently working with
-    */
-/*void printTotal(struct node *ptr) {
-    printf("%d\n",totalKeys(ptr));
-}*/
-
-/* Function that returns the smallest key found in the tree.
-    @param struct node *ptr, the pointer to the node you are currently working with
-    */
-/*int getMin(struct node *ptr) {
-    if (ptr) {
-        int min;
-        if (ptr->p[0] != NULL) min = getMin(ptr->p[0]);
-        else min = ptr->keys[0];
-        return min;
-    }
-    return 0;
-}*/
-
-/* Function that returns the largest key found in the tree.
-    @param struct node *ptr, the pointer to the node you are currently working with
-    */
-/*int getMax(struct node *ptr) {
-    if (ptr) {
-        int max;
-        if (ptr->n == 1) {
-            if (ptr->p[1] != NULL) max = getMax(ptr->p[1]);
-            else max = ptr->keys[0];
-        }
-        if (ptr->n == 2) {
-            if (ptr->p[2] != NULL) max = getMax(ptr->p[2]);
-            else max = ptr->keys[1];
-        }
-        return max;
-    }
-    return 0;
-}*/
-
-/* Function that prints the smallest and largest keys found in the tree.
-    @param struct node *ptr, the pointer to the node you are currently working with
-    */
-/*void getMinMax(struct node *ptr) {
-    printf("%d %d\n", getMin(ptr), getMax(ptr));
-}*/
-
-/* Function that determines the largest number.
-    @param int, integer to compare.
-    @param int, integer to compare.
-    @param int, integer to compare.
-    */
-/*int max(int first, int second, int third) {
-    int max = first;
-    if (second > max) max = second;
-    if (third > max) max = third;
-    return max;
-}*/
-
-/*Function that finds the maximum level in the node and returns it as an integer.
-    @param struct node *ptr, the node to find the maximum level for.
-    */
-/*int maxLevel(struct node *ptr) {
-    if (ptr) {
-        int l = 0, mr = 0, r = 0, max_depth;
-        if (ptr->p[0] != NULL) l = maxLevel(ptr->p[0]);
-        if (ptr->p[1] != NULL) mr = maxLevel(ptr->p[1]);
-        if (ptr->n == 2) {
-            if (ptr->p[2] != NULL) r = maxLevel(ptr->p[2]);
-        }
-        max_depth = max(l, mr, r) + 1;
-        return max_depth;
-    }
-    return 0;
-}
-*/
-/*Function that prints the maximum level in the tree.
-    @param struct node *ptr, the tree to find the maximum level for.
-    */
-/*void printMaxLevel(struct node *ptr) {
-    int max = maxLevel(ptr) - 1;
-    if (max == -1) printf("tree is empty\n");
-    else printf("%d\n", max);
-}*/
