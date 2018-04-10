@@ -1,5 +1,5 @@
 
-
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,43 +7,206 @@
 
 struct node {
     int n; /* n < M No. of keys in node will always less than order of B tree */
-    int keys[M-1]; /*array of keys*/
+    double keys[M-1]; /*array of keys*/
     struct node *p[M]; /* (n+1 pointers will be in use) */
 }*root=NULL;
 
 enum KeyStatus { Duplicate,SearchFailure,Success,InsertIt,LessKeys };
 
-void insert(int key);
+void insert(double key);
 void display(struct node *root,int);
-void DelNode(int x);
-void search(int x);
-enum KeyStatus ins(struct node *r, int x, int* y, struct node** u);
-int searchPos(int x,int *key_arr, int n);
-enum KeyStatus del(struct node *r, int x);
+void DelNode(double x);
+void comm_search(double key, char multi, char * path);
+enum KeyStatus ins(struct node *r, double x, double* y, struct node** u);
+int searchPos(double x,double *key_arr, int n);
+enum KeyStatus del(struct node *r, double x);
 int readFile();
 
-void comm_insert(int key)
+void proc_search(double key)
 {
-    insert ( key );
+    int pos, i, n;
+    struct node *ptr = root;
+
+    while (ptr)
+    {
+        n = ptr->n;
+        // for (i=0; i < ptr->n; i++)
+        //     printf(" %f",ptr->keys[i]);
+        // printf("\n");
+        pos = comm_searchPos(key, ptr->keys, n);
+        if (pos < n && key == ptr->keys[pos])
+        {
+            printf("Key %f found in position %d of last dispalyed node\n",key,i);
+            return;
+        }
+        ptr = ptr->p[pos];
+    }
+    printf("Key %f is not available\n",key);
 }
+
+int comm_searchPos(double key, double *key_arr, int n)
+{
+    int pos=0;
+    while (pos < n && key > key_arr[pos])
+        pos++;
+    return pos;
+}/*End of searchPos()*/
+
+enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node **newnode)
+{
+    struct node *newPtr, *lastPtr;
+    int pos, i, n,splitPos;
+    double newKey, lastKey;
+    enum KeyStatus value;
+    if (ptr == NULL)
+    {
+        *newnode = NULL;
+        *upKey = key;
+        return InsertIt;
+    }
+    n = ptr->n;
+    pos = comm_searchPos(key, ptr->keys, n);
+    if (pos < n && key == ptr->keys[pos])
+        return Duplicate;
+    value = comm_ins(ptr->p[pos], key, &newKey, &newPtr);
+    if (value != InsertIt)
+        return value;
+    /*If keys in node is less than M-1 where M is order of B tree*/
+    if (n < M - 1)
+    {
+        pos = comm_searchPos(newKey, ptr->keys, n);
+        /*Shifting the key and pointer right for inserting the new key*/
+        for (i=n; i>pos; i--)
+        {
+            ptr->keys[i] = ptr->keys[i-1];
+            ptr->p[i+1] = ptr->p[i];
+        }
+        /*Key is inserted at exact location*/
+        ptr->keys[pos] = newKey;
+        ptr->p[pos+1] = newPtr;
+        ++ptr->n; /*incrementing the number of keys in node*/
+        return Success;
+    }/*End of if */
+    /*If keys in nodes are maximum and position of node to be inserted is last*/
+    if (pos == M - 1)
+    {
+        lastKey = newKey;
+        lastPtr = newPtr;
+    }
+    else /*If keys in node are maximum and position of node to be inserted is not last*/
+    {
+        lastKey = ptr->keys[M-2];
+        lastPtr = ptr->p[M-1];
+        for (i=M-2; i>pos; i--)
+        {
+            ptr->keys[i] = ptr->keys[i-1];
+            ptr->p[i+1] = ptr->p[i];
+        }
+        ptr->keys[pos] = newKey;
+        ptr->p[pos+1] = newPtr;
+    }
+    splitPos = (M - 1)/2;
+    (*upKey) = ptr->keys[splitPos];
+
+    (*newnode)=malloc(sizeof(struct node));/*Right node after split*/
+    ptr->n = splitPos; /*No. of keys for left splitted node*/
+    (*newnode)->n = M-1-splitPos;/*No. of keys for right splitted node*/
+    for (i=0; i < (*newnode)->n; i++)
+    {
+        (*newnode)->p[i] = ptr->p[i + splitPos + 1];
+        if(i < (*newnode)->n - 1)
+            (*newnode)->keys[i] = ptr->keys[i + splitPos + 1];
+        else
+            (*newnode)->keys[i] = lastKey;
+    }
+    (*newnode)->p[(*newnode)->n] = lastPtr;
+    return InsertIt;
+}
+
+void comm_insert(double key, char multi, char * path)
+{
+    struct node *newnode;
+    double upKey;
+    enum KeyStatus value;
+    FILE * fp;
+    fp = fopen(path,"r");
+
+    if (multi == 'm')
+    {
+        while(1)
+        {
+            fscanf ( fp, "%lf,", &key );
+
+            if (feof(fp))
+            {
+                break;
+            }
+
+            value = comm_ins(root, key, &upKey, &newnode);
+            if (value == Duplicate)
+                printf("Key %f already available\n", key);
+            if (value == InsertIt)
+            {
+                struct node *uproot = root;
+                root=malloc(sizeof(struct node));
+                root->n = 1;
+                root->keys[0] = upKey;
+                root->p[0] = uproot;
+                root->p[1] = newnode;
+            }/*End of if */
+
+        }
+        fclose ( fp );
+    }
+    else
+    {
+        value = comm_ins(root, key, &upKey, &newnode);
+        if (value == Duplicate)
+            printf("Key %f already available\n", key);
+        if (value == InsertIt)
+        {
+            struct node *uproot = root;
+            root=malloc(sizeof(struct node));
+            root->n = 1;
+            root->keys[0] = upKey;
+            root->p[0] = uproot;
+            root->p[1] = newnode;
+        }/*End of if */
+    }// end else
+}
+
+
 int main(int argc, char const *argv[])
 {
-    int key;
+    double key;
     int choice;
+    char * key_path;
+    char s_m = 's';
     printf("Creation of B tree for M=%d\n",M);
     readFile();
     choice = *argv [1];
-    key    = atoi ( argv [2] );
+    // btree func value
+    // btree func m[s] path
+    if (*argv [2] == 'm' || *argv [2] == 's')
+    {
+        s_m = *argv [2];
+        key_path = argv [3];
+    }
+    else
+    {
+        key = atol ( argv [2] );
+    }
+
     switch(choice)
     {
     case 'i':
-        comm_insert(key);
+        comm_insert(key,s_m,key_path);
         break;
     case 'd':
         DelNode(key);
         break;
     case 's':
-        search(key);
+        comm_search(key,s_m,key_path);
         break;
     default:
         printf("Wrong choice\n");
@@ -52,14 +215,14 @@ int main(int argc, char const *argv[])
     return 0;
 }/*End of main()*/
 
-void insert(int key)
+void insert(double key)
 {
     struct node *newnode;
-    int upKey;
+    double upKey;
     enum KeyStatus value;
     value = ins(root, key, &upKey, &newnode);
     if (value == Duplicate)
-        printf("Key already available\n");
+        printf("Key %f already available\n", key);
     if (value == InsertIt)
     {
         struct node *uproot = root;
@@ -74,14 +237,14 @@ void insert(int key)
 int readFile()
 {
     FILE * fp = NULL;
-    int buff  = 0;
+    double buff  = 0.0;
 
     fp = fopen ( "./test.dat" , "r"); 
 
     // fseek ( fp, pos, SEEK_SET );
     while (1)
     {
-        fscanf ( fp, "%i,", &buff );
+        fscanf ( fp, "%lf,", &buff );
         if (feof(fp))
         {
             break;
@@ -94,11 +257,11 @@ int readFile()
 }
 
 
-enum KeyStatus ins(struct node *ptr, int key, int *upKey,struct node **newnode)
+enum KeyStatus ins(struct node *ptr, double key, double *upKey,struct node **newnode)
 {
     struct node *newPtr, *lastPtr;
     int pos, i, n,splitPos;
-    int newKey, lastKey;
+    double newKey, lastKey;
     enum KeyStatus value;
     if (ptr == NULL)
     {
@@ -165,44 +328,48 @@ enum KeyStatus ins(struct node *ptr, int key, int *upKey,struct node **newnode)
     return InsertIt;
 }/*End of ins()*/
 
-void display(struct node *ptr, int blanks)
-{
-    if (ptr)
-    {
-        int i;
-        for(i=1; i<=blanks; i++)
-            printf(" ");
-        for (i=0; i < ptr->n; i++)
-            printf("%d ",ptr->keys[i]);
-        printf("\n");
-        for (i=0; i <= ptr->n; i++)
-            display(ptr->p[i], blanks+10);
-    }/*End of if*/
-}/*End of display()*/
+// void display(struct node *ptr, float blanks)
+// {
+//     if (ptr)
+//     {
+//         int i;
+//         for(i=1; i<=blanks; i++)
+//             printf(" ");
+//         for (i=0; i < ptr->n; i++)
+//             printf("%d ",ptr->keys[i]);
+//         printf("\n");
+//         for (i=0; i <= ptr->n; i++)
+//             display(ptr->p[i], blanks+10);
+//     }/*End of if*/
+// }/*End of display()*/
 
-void search(int key)
+void comm_search(double key, char multi, char * path)
 {
-    int pos, i, n;
-    struct node *ptr = root;
-    printf("Search path:\n");
-    while (ptr)
+    FILE * fp;
+    // printf("Search path:\n");
+
+    if (multi == 'm')
     {
-        n = ptr->n;
-        for (i=0; i < ptr->n; i++)
-            printf(" %d",ptr->keys[i]);
-        printf("\n");
-        pos = searchPos(key, ptr->keys, n);
-        if (pos < n && key == ptr->keys[pos])
+        fp = fopen(path,"r");
+        while(1)
         {
-            printf("Key %d found in position %d of last dispalyed node\n",key,i);
-            return;
+            fscanf ( fp, "%lf,", &key );
+
+            if (feof(fp))
+            {
+                break;
+            }
+            proc_search(key);
         }
-        ptr = ptr->p[pos];
+        fclose ( fp );
     }
-    printf("Key %d is not available\n",key);
+    else
+    {
+        proc_search(key);
+    }// end else
 }/*End of search()*/
 
-int searchPos(int key, int *key_arr, int n)
+int searchPos(double key, double *key_arr, int n)
 {
     int pos=0;
     while (pos < n && key > key_arr[pos])
@@ -210,7 +377,7 @@ int searchPos(int key, int *key_arr, int n)
     return pos;
 }/*End of searchPos()*/
 
-void DelNode(int key)
+void DelNode(double key)
 {
     struct node *uproot;
     enum KeyStatus value;
@@ -218,7 +385,7 @@ void DelNode(int key)
     switch (value)
     {
     case SearchFailure:
-        printf("Key %d is not available\n",key);
+        printf("Key %f is not available\n",key);
         break;
     case LessKeys:
         uproot = root;
@@ -228,10 +395,10 @@ void DelNode(int key)
     }/*End of switch*/
 }/*End of delnode()*/
 
-enum KeyStatus del(struct node *ptr, int key)
+enum KeyStatus del(struct node *ptr, double key)
 {
     int pos, i, pivot, n ,min;
-    int *key_arr;
+    double *key_arr;
     enum KeyStatus value;
     struct node **p,*lptr,*rptr;
 
