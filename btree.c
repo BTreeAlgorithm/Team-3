@@ -24,7 +24,7 @@ int readFile();
 
 void proc_search(double key)
 {
-    int pos, i, n;
+    int pos, i=0, n;
     struct node *ptr = root;
 
     while (ptr)
@@ -33,7 +33,10 @@ void proc_search(double key)
         // for (i=0; i < ptr->n; i++)
         //     printf(" %f",ptr->keys[i]);
         // printf("\n");
-        pos = comm_searchPos(key, ptr->keys, n);
+        // pos = comm_searchPos(key, ptr->keys, n);
+        while (i < n && key > ptr->keys[i])
+            i++;
+        pos = i;
         if (pos < n && key == ptr->keys[pos])
         {
             printf("Key %f found in position %d of last dispalyed node\n",key,i);
@@ -44,13 +47,13 @@ void proc_search(double key)
     printf("Key %f is not available\n",key);
 }
 
-int comm_searchPos(double key, double *key_arr, int n)
-{
-    int pos=0;
-    while (pos < n && key > key_arr[pos])
-        pos++;
-    return pos;
-}/*End of searchPos()*/
+// int comm_searchPos(double key, double *key_arr, int n)
+// {
+//     int pos=0;
+//     while (pos < n && key > key_arr[pos])
+//         pos++;
+//     return pos;
+// }/*End of searchPos()*/
 
 enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node **newnode)
 {
@@ -65,7 +68,12 @@ enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node 
         return InsertIt;
     }
     n = ptr->n;
-    pos = comm_searchPos(key, ptr->keys, n);
+    // pos = comm_searchPos(key, ptr->keys, n);
+    i = 0;
+    while (i < n && key > ptr->keys[i])
+        i++;
+    pos = i;
+
     if (pos < n && key == ptr->keys[pos])
         return Duplicate;
     value = comm_ins(ptr->p[pos], key, &newKey, &newPtr);
@@ -74,7 +82,11 @@ enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node 
     /*If keys in node is less than M-1 where M is order of B tree*/
     if (n < M - 1)
     {
-        pos = comm_searchPos(newKey, ptr->keys, n);
+        // pos = comm_searchPos(newKey, ptr->keys, n);
+        i = 0;
+        while (i < n && key > ptr->keys[i])
+            i++;
+        pos = i;
         /*Shifting the key and pointer right for inserting the new key*/
         for (i=n; i>pos; i--)
         {
