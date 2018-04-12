@@ -16,7 +16,7 @@ enum KeyStatus { Duplicate,SearchFailure,Success,InsertIt,LessKeys };
 void insert(double key);
 void display(struct node *root,int);
 void DelNode(double x);
-void comm_search(double key, char multi, char * path);
+void cmd_search(double key, char multi, char * path);
 enum KeyStatus ins(struct node *r, double x, double* y, struct node** u);
 int searchPos(double x,double *key_arr, int n);
 enum KeyStatus del(struct node *r, double x);
@@ -30,10 +30,6 @@ void proc_search(double key)
     while (ptr)
     {
         n = ptr->n;
-        // for (i=0; i < ptr->n; i++)
-        //     printf(" %f",ptr->keys[i]);
-        // printf("\n");
-        // pos = comm_searchPos(key, ptr->keys, n);
         while (i < n && key > ptr->keys[i])
             i++;
         pos = i;
@@ -47,15 +43,7 @@ void proc_search(double key)
     printf("Key %f is not available\n",key);
 }
 
-// int comm_searchPos(double key, double *key_arr, int n)
-// {
-//     int pos=0;
-//     while (pos < n && key > key_arr[pos])
-//         pos++;
-//     return pos;
-// }/*End of searchPos()*/
-
-enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node **newnode)
+enum KeyStatus cmd_ins(struct node *ptr, double key, double *upKey,struct node **newnode)
 {
     struct node *newPtr, *lastPtr;
     int pos, i, n,splitPos;
@@ -68,7 +56,6 @@ enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node 
         return InsertIt;
     }
     n = ptr->n;
-    // pos = comm_searchPos(key, ptr->keys, n);
     i = 0;
     while (i < n && key > ptr->keys[i])
         i++;
@@ -76,13 +63,12 @@ enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node 
 
     if (pos < n && key == ptr->keys[pos])
         return Duplicate;
-    value = comm_ins(ptr->p[pos], key, &newKey, &newPtr);
+    value = cmd_ins(ptr->p[pos], key, &newKey, &newPtr);
     if (value != InsertIt)
         return value;
     /*If keys in node is less than M-1 where M is order of B tree*/
     if (n < M - 1)
     {
-        // pos = comm_searchPos(newKey, ptr->keys, n);
         i = 0;
         while (i < n && key > ptr->keys[i])
             i++;
@@ -135,7 +121,7 @@ enum KeyStatus comm_ins(struct node *ptr, double key, double *upKey,struct node 
     return InsertIt;
 }
 
-void comm_insert(double key, char multi, char * path)
+void cmd_insert(double key, char multi, char * path)
 {
     struct node *newnode;
     double upKey;
@@ -154,7 +140,7 @@ void comm_insert(double key, char multi, char * path)
                 break;
             }
 
-            value = comm_ins(root, key, &upKey, &newnode);
+            value = cmd_ins(root, key, &upKey, &newnode);
             if (value == Duplicate)
                 printf("Key %f already available\n", key);
             if (value == InsertIt)
@@ -172,7 +158,7 @@ void comm_insert(double key, char multi, char * path)
     }
     else
     {
-        value = comm_ins(root, key, &upKey, &newnode);
+        value = cmd_ins(root, key, &upKey, &newnode);
         if (value == Duplicate)
             printf("Key %f already available\n", key);
         if (value == InsertIt)
@@ -212,13 +198,13 @@ int main(int argc, char const *argv[])
     switch(choice)
     {
     case 'i':
-        comm_insert(key,s_m,key_path);
+        cmd_insert(key,s_m,key_path);
         break;
     case 'd':
         DelNode(key);
         break;
     case 's':
-        comm_search(key,s_m,key_path);
+        cmd_search(key,s_m,key_path);
         break;
     default:
         printf("Wrong choice\n");
@@ -340,22 +326,7 @@ enum KeyStatus ins(struct node *ptr, double key, double *upKey,struct node **new
     return InsertIt;
 }/*End of ins()*/
 
-// void display(struct node *ptr, float blanks)
-// {
-//     if (ptr)
-//     {
-//         int i;
-//         for(i=1; i<=blanks; i++)
-//             printf(" ");
-//         for (i=0; i < ptr->n; i++)
-//             printf("%d ",ptr->keys[i]);
-//         printf("\n");
-//         for (i=0; i <= ptr->n; i++)
-//             display(ptr->p[i], blanks+10);
-//     }/*End of if*/
-// }/*End of display()*/
-
-void comm_search(double key, char multi, char * path)
+void cmd_search(double key, char multi, char * path)
 {
     FILE * fp;
     // printf("Search path:\n");
