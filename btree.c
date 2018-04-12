@@ -24,12 +24,13 @@ int readFile();
 
 void proc_search(double key)
 {
-    int pos, i=0, n;
+    int pos, i, n;
     struct node *ptr = root;
 
     while (ptr)
     {
         n = ptr->n;
+        i = 0;
         while (i < n && key > ptr->keys[i])
             i++;
         pos = i;
