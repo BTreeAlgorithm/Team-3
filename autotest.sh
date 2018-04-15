@@ -23,8 +23,12 @@ until [[ i -gt $end ]]; do
     ./random $repeat search.dat $choice
     ./btree s m search.dat
     gprof btree gmon.out > profiling/$i.dat
-    i=$((3*$i))
     echo i=$i finished
+    if [[ $i -gt 10000000 ]]; then
+        i=$((3*$i))
+    else;
+        i=$((10000000+$i))
+    fi
 done
 # for i in {3000..3000..10}; do
 #     #statements
