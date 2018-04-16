@@ -24,9 +24,11 @@ until [[ i -gt $end ]]; do
     ./btree s m search.dat
     gprof btree gmon.out > profiling/$i.dat
     echo i=$i finished
-    if [[ $i -gt 10000000 ]]; then
+    if [[ $i -lt 8000000 ]]; then
         i=$((3*$i))
-    else;
+    elif [[ $i -lt 50000000 ]]; then
+        i=$((5000000+$i))
+    else
         i=$((10000000+$i))
     fi
 done
